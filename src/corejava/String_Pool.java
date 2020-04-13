@@ -68,7 +68,7 @@ import org.junit.Test;
  *					这时候字符串常量池还在堆, 运行时常量池还在方法区, 只不过方法区的实现从永久代变成了元空间.
  * 
  * 3. 全局字符串常量池
- * 		为了避免多次创建字符串对象,而将字符串在jvm中开辟一块空间,储存不重复的字符串.
+ 		为了避免多次创建字符串对象,而将字符串在jvm中开辟一块空间,储存不重复的字符串.
 		在直接使用双引号""声明字符串的时候, java都会去常量池找有没有这个相同的字符串,
 			如果有,则将常量池的引用返回给变量. 
 			如果没有,会在字符串常量池中创建一个对象,调用intern()方法后 ，将字符串加入常量池。然后返回这个对象的引用
@@ -87,12 +87,12 @@ import org.junit.Test;
 			如果类加载时，该字符串常量在常量池中已经有了，那这一步就省略了。
 			堆中的对象是在运行期才确定的，在代码执行到new的时候创建的。
 			
-			
+			//—*—
 			将String常量池 从 Perm 区移动到了 Java Heap区
 			String#intern 方法时，如果存在堆中的对象，会直接保存对象的引用，而不会重新创建对象。
 				这个方法是一个 native 的方法，但注释写的非常明了。
 				如果常量池中存在当前字符串, 就会直接返回当前字符串. 
-				如果常量池中没有此字符串, 会将此字符串放入常量池中后, 再返回。
+				如果常量池中没有此字符串, 会将此字符串放入常量池中后, 再返回引用。
 		
  * 
  * 	jdk1.6及之前,字符串常量池是属于运行时常量池中的
@@ -119,23 +119,36 @@ public class String_Pool {
 	    
 	    
 	    String s3 = new String("1") + new String("1"); //11 ，常量池中是没有 “11”对象。
-	    s3.intern();//将 s3中的“11”字符串放入 String 常量池中，因为此时常量池中不存在“11”字符串，
+	    String intern_s3 = s3.intern();//将 s3中的“11”字符串放入 String 常量池中，因为此时常量池中不存在“11”字符串，
 //	   					因此常规做法是跟 jdk6 图中表示的那样，在常量池中生成一个 “11” 的对象，
 //	          			关键点是 jdk7 中常量池不在 Perm 区域了，这块做了调整。
 //	          			常量池中不需要再存储一份对象了，可以直接存储堆中的引用。
 //	          			这份引用指向 s3 引用的对象。 也就是说引用地址是相同的。
-	    String s4 = "11";//”11”是显示声明的，因此会直接去常量池中创建，创建的时候发现已经有这个对象了，此时也就是指向 s3 引用对象的一个引用。
+	    String s4 = "11";//"11"是显示声明的，因此会直接去常量池中创建，创建的时候发现已经有这个对象了，此时也就是指向 s3 引用对象的一个引用。
 	    System.out.println("s3 == s4: "+(s3 == s4));//true
 	    
-	    String s_3 = new String("1") + new String("1");//这份引用指向 s3 引用的对象。 
-	    String s_4 = "11";//首先执行String s_4 = "11";声明 s_4 的时候常量池中是不存在“11”对象的，执行完毕后，“11“对象是 s_4 声明产生的新对象。
-	    s_3.intern();//常量池中“11”对象已经存在了，因此 s3 和 s4 的引用是不同的。
+	    String s_3 = new String("1") + new String("1");//当使用 new String()构造的字符字符串 生成 s_3 引用
+	    String s_3t = new String("1") + new String("1");//当使用 new String()构造的字符字符串 生成 s_3t 引用
+	    String s_3x = "1" + "1";//直接的字符拼接，直接去常量池中创建，发现已经有这个对象了，此时指向 s3 引用对象的一个引用。
+	    
+	    System.out.println("s_3t == s_3: "+(s_3t == s_3));//false
+	    System.out.println("s_3x == s3: "+(s_3x == s3));//true
+	    System.out.println("s_3 == s3: "+(s_3 == s3));//false
+	    System.out.println("s_3 == s4: "+(s_3 == s4));//false
+	    System.out.println("s_3x == s4: "+(s_3x == s4));//true
+	    
+	    String s_4 = "11";//"11"是显示声明的，因此会直接去常量池中创建，创建的时候发现已经有这个对象了，此时也就是指向 s3 引用对象的一个引用。
+	    String intern_s_3 = s_3.intern();//如果常量池中存在当前字符串, 就会直接返回当前字符串.intern_s_3 == "11"
+	    
+	    System.out.println("s_3 == intern_s3: "+(s_3 == intern_s3));//false
+	    System.out.println("intern_s_3 == intern_s3: "+(intern_s_3 == intern_s3));//true
+	    System.out.println("s_3 == s4: "+(s_3 == s4));//false
 	    System.out.println("s_3 == s_4: "+(s_3 == s_4));//false
 	    
 	    
-	    String str1 = "Hollis";
-	    String str2 = new String("Hollis");
-	    String str3 = new String("Hollis").intern();
+	    String str1 = "Hollis";//常量池 中声明  "Hollis"
+	    String str2 = new String("Hollis"); //当使用 new String() 构造的字符字符串 生成str2引用
+	    String str3 = new String("Hollis").intern();///常量池中存在当前字符串, 就会直接返回当前字符串.str3== "Hollis"
 
 	    System.out.println("str1 == str2: "+(str1 == str2));//false
 	    System.out.println("str1 == str3: "+(str1 == str3));//true

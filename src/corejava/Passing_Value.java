@@ -39,10 +39,6 @@ public class Passing_Value {
 	/*
 		stringPass()... hello
 		intTest()... he
-	 *
-	 * 
-	 * 
-	 * 
 	 * */
 	@Test
 	public void stringTest() {
@@ -54,6 +50,7 @@ public class Passing_Value {
 		s = s+"llo";
 		System.out.println("stringPass()... "+s);
 	}
+	
 	
 	/*
 	 * 引用传递：也就是指向真实内容的地址值，在方法调用时，实参的地址通过方法调用被传递给相应的形参，
@@ -76,26 +73,17 @@ public class Passing_Value {
 		PassHandles handle1 = new PassHandles();
 		PassHandles handle2 = handle1;
 		
-		System.out.println(handle1);
-		System.out.println(handle2);
+		System.out.println(handle1);//corejava.PassHandles@158a3b2e
+		System.out.println(handle2);//corejava.PassHandles@158a3b2e
 		
 		System.out.println("------");
 		
 		PassHandles h = new PassHandles();
-		h.f(h);
-		System.out.println("h inside main(): " + h);
+		h.f(h);//h inside f(): corejava.PassHandles@25a6944c
+		System.out.println("h inside main(): " + h);//h inside main(): corejava.PassHandles@25a6944c
 	}
 	
 	/*
-		corejava.Alias1@4a87761d
-		corejava.Alias1@4a87761d
-		-----
-		x: 7
-		y: 7
-		Incrementing x
-		x: 8
-		y: 8
-	 *
 	 *Alias1 y = x; // Assign the handle
 	 * 	它会新建一个 Alias1 句柄，但不是把它分配给由 new 创建的一个新鲜对象，而是分配给一个现有的句柄。所
 		以句柄 x 的内容—— 即对象 x 指向的地址—— 被分配给 y，所以无论 x 还是 y 都与相同的对象连接起来。这
@@ -108,32 +96,33 @@ public class Passing_Value {
 		方法—— 别名问题就会自动出现，因为创建的本地句柄可能修改“外部对象”（在方法作用域之外创建的对
 		象）。
 	 * 
-	 * 
+	 * ---------------------
+		class Alias1 {
+			int i;
+			Alias1(int ii) { 
+				i = ii; 
+			}
+		}
 	 * */
 	@Test
 	public void alias1Test() {
 		Alias1 x = new Alias1(7);
 		Alias1 y = x; // Assign the handle
 		
-		System.out.println(x);
-		System.out.println(y);
+		System.out.println(x);//corejava.Alias1@4a87761d
+		System.out.println(y);//corejava.Alias1@4a87761d
 		
 		System.out.println("-----");
 		
-		System.out.println("x: " + x.i);
-		System.out.println("y: " + y.i);
-		System.out.println("Incrementing x");
+		System.out.println("x: " + x.i);//x: 7
+		System.out.println("y: " + y.i);//y: 7
+		System.out.println("Incrementing x");//Incrementing x
 		x.i++;
-		System.out.println("x: " + x.i);
-		System.out.println("y: " + y.i);
+		System.out.println("x: " + x.i);//x: 8
+		System.out.println("y: " + y.i);//y: 8
 	}
 	
 	/*
-		x: 7
-		Calling f(x)
-		x: 8
-	 *
-	 * 
 	 *  方法改变了自己的参数—— 外部对象。
 	 *  一旦遇到这种情况，必须判断它是否合理，用户是否愿意这样，以及是不是会造成问题。
 		通常，我们调用一个方法是为了产生返回值，或者用它改变为其调用方法的那个对象的状态（方法其实就是
@@ -142,22 +131,33 @@ public class Passing_Value {
 		告使用那个方法可能会有的后果以及它的潜在威胁。由于存在这些混淆和缺陷，所以应该尽量避免改变参数。
 		若需在一个方法调用期间修改一个参数，且不打算修改外部参数，就应在自己的方法内部制作一个副本，从
 		而保护那个参数。
+	 * -------------------------------------
+		class Alias2 {
+			int i;
+			Alias2(int ii) {
+				i = ii; 
+			}
+			static void f(Alias2 handle) {
+				handle.i++;
+			}
+		}	
+	 *
 	 * */
 	@Test
 	public void alias2Test() {
 		Alias2 x = new Alias2(7);
 		
 		Alias2 y = x;
-		System.out.println("x: " + x.i);
+		System.out.println("x: " + x.i);//x: 7
 		y.i++;
-		System.out.println("x: " + x.i);
+		System.out.println("x: " + x.i);//x: 8
 		
 		System.out.println("-----");
 		
-		System.out.println("x: " + x.i);
+		System.out.println("x: " + x.i);//x: 8
 		System.out.println("Calling f(x)");
 		x.f(x);
-		System.out.println("x: " + x.i);
+		System.out.println("x: " + x.i);//x: 9
 	}
 	
 	/*总结：

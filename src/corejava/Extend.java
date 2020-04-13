@@ -28,9 +28,17 @@ class ExA{
 	public ExA() {}
 	public ExA(String s ,int i) {}
 	
-	private void priPri() {//不能够继承父类的private成员方法；
+	//类的private方法会隐式地被指定为final方法
+	//不能够继承父类的private成员方法
+	private void priPri() {
 		System.out.println("ExA{}...priPri()");
 	}
+	
+	//只有在想明确禁止 该方法在子类中被覆盖的情况下 才将方法设置为final
+	private final void f_priPri() {
+		System.out.println("ExA{}...priPri()");
+	}
+	
 	public void priPub() {
 		System.out.println("ExA{}...priPub()");
 	}
@@ -54,16 +62,16 @@ class ExB extends ExA{
 		System.out.println("ExB{}...j+2: "+j);//4
 		System.out.println("super.j: "+super.j);//2
 		
-		System.out.println(k);
+		System.out.println(k);//3
 		
-		System.out.println(g);
-		System.out.println("super.g: "+super.g);
+		System.out.println(g);//14
+		System.out.println("super.g: "+super.g);//4
 		
-		System.out.println(h);
+		System.out.println(h);//5
 		
-		System.out.println(m);
+		System.out.println(m);//6
 		m=m+10;
-		System.out.println("ExA{}...static K+: "+m);
+		System.out.println("ExA{}...static K+: "+m);//16
 		
 		//priPri();
 		priPub();
