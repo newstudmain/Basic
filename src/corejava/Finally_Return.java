@@ -84,7 +84,7 @@ public class Finally_Return {
 		finally 语句块是在 try 或者 catch 中的 return 语句之前执行的。
 		更加一般的说法是，finally 语句块应该是在控制转移语句之前执行，
 		控制转移语句除了 return 外，还有 break 和 continue。另外，throw 语句也属于控制转移语句。
-		虽然 return、throw、break 和 continue 都是控制转移语句，但是它们之间是有区别的。
+		虽然return、throw、break 和 continue 都是控制转移语句，但是它们之间是有区别的。
 		其中 return 和 throw 把程序控制权转交给它们的调用者（invoker），而 break 和 continue 的控制权是在当前方法内转移。
 		
 		public static int getValue1() { 
