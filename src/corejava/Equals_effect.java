@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
  * 	Object()
 	registerNatives()
 	getClass()
-	hashCode()	//
+	hashCode()	//https://www.cnblogs.com/dolphin0520/p/3681042.html
 	equals(Object)	//
 	clone()	//
 	toString()	//
