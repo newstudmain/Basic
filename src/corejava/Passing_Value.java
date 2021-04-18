@@ -28,9 +28,11 @@ public class Passing_Value {
 	@Test
 	public void intTest() {
 		int i = 10;
+		
 		intPass(i);
 		System.out.println("intTest()... "+i);
 	}
+	
 	public void intPass(int i) {
 		i = i*2;
 		System.out.println("intPass()... "+i);
@@ -54,7 +56,7 @@ public class Passing_Value {
 	
 	/*
 	 * 引用传递：也就是指向真实内容的地址值，在方法调用时，实参的地址通过方法调用被传递给相应的形参，
-	 * 		      在方法体内，形参和实参指向通愉快内存地址，对形参的操作会影响的真实内容。
+	 * 		      在方法体内，形参和实参指向通一块内存地址，对形参的操作会影响的真实内容。
 	 * 
 		h inside f(): corejava.PassHandles@4a87761d
 		h inside main(): corejava.PassHandles@4a87761d
@@ -65,6 +67,14 @@ public class Passing_Value {
 	 * 别名问题
 		别名意味着多个句柄都试图指向同一个对象，就象前面的例子展示的那样。若有人向那个对象里写入一
 		点什么东西，就会产生别名问题。若其他句柄的所有者不希望那个对象改变，恐怕就要失望了。
+	 * 
+	 * ----------------------
+	 * 
+	 * class PassHandles {
+			static void f(PassHandles h) {
+				System.out.println("h inside f(): " + h);
+			}
+		}
 	 * 
 	 * */
 	@Test
@@ -158,6 +168,7 @@ public class Passing_Value {
 		System.out.println("Calling f(x)");
 		x.f(x);
 		System.out.println("x: " + x.i);//x: 9
+		System.out.println("y: " + y.i);//x: 9
 	}
 	
 	/*总结：
@@ -214,20 +225,54 @@ public class Passing_Value {
 	public void cloneTest() {
 		
 			Vector v = new Vector();
-			for(int i = 0; i < 10; i++ )
+			
+			for(int i = 0; i < 10; i++ ) {
 				v.addElement(new Int(i));
-			System.out.println("v: " + v);
+			}
+			System.out.println("v: " + v); // v: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 			
 			Vector v2 = (Vector)v.clone();
+			
+			/*
+			 *  Vector 的 clone()方法
+				不能自动尝试克隆 Vector 内包含的每个对象. 由于别名问题，老的 Vector 和克隆的 Vector 都包含了相同
+				的对象。我们通常把这种情况叫作“简单复制”或者“浅层复制”，因为它只复制了一个对象的“表面”部
+				分。实际对象除包含这个“表面”以外，还包括句柄指向的所有对象，以及那些对象又指向的其他所有对
+				象，由此类推。这便是“对象网”或“对象关系网”的由来。若能复制下所有这张网，便叫作“全面复制”
+				或者“深层复制”
+			 * */
+			System.out.println("v: "+ v.hashCode()+",v2: "+v2.hashCode());// v: -210090821,v2: -210090821
+			
 			// Increment all v2's elements:
-			for(Enumeration e = v2.elements();
-					e.hasMoreElements(); )
-			((Int)e.nextElement()).increment();
+			for(Enumeration e = v2.elements(); e.hasMoreElements();) {
+				((Int) e.nextElement()).increment();
+			}
 			// See if it changed v's elements:
-			System.out.println("v: " + v);
+			System.out.println("v: " + v); // v: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 			
-			System.out.println(v);
+			System.out.println(v); // [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 			
+			/*
+			 * 在输出中可看到浅层复制的结果，注意对 v2 采取的行动也会影响到 v：
+				v: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+				v: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+				一般来说，由于不敢保证 Vector 里包含的对象是“可以克隆”的，所以最好不要试图克隆那些对象
+			 * 
+			 * */
+			
+	}
+}
+
+class Int {
+	private int i;
+	public Int(int ii) {
+		i = ii;
+	}
+	public void increment() {
+		i++;
+	}
+	public String toString() {
+		return Integer.toString(i);
 	}
 }
 
@@ -254,15 +299,3 @@ class Alias2 {
 	}
 }	
 
-class Int {
-	private int i;
-	public Int(int ii) {
-		i = ii;
-	}
-	public void increment() {
-		i++;
-	}
-	public String toString() {
-		return Integer.toString(i);
-	}
-}

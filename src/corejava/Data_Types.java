@@ -2,7 +2,7 @@ package corejava;
 
 /*
  * 整数型
-		byte 	8 位		Byte		0		-128...127
+		byte 	8  位		Byte		0		-128...127
 		short 	16 位		Short		0		-32768...32767
 		int 	32 位		Integer		0		-2147483648...2147483647
 		long 	64 位		Long		0L		-9223372036854775808...922337203685477580
