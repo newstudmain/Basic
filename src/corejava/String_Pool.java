@@ -1,5 +1,7 @@
 package corejava;
 
+import java.util.Random;
+
 import org.junit.Test;
 
 /*
@@ -81,7 +83,7 @@ import org.junit.Test;
 			- 	在运行期，new String("hello");执行到的时候，是要在Java堆中创建一个字符串对象的，
 				而这个对象所对应的字符串字面量是保存在字符串常量池中的。
 				但是，String a = new String("hello");
-				对象的符号引用a是保存在Java虚拟机栈上的，他保存的是堆中刚刚创建出来的的字符串对象的引用。
+				对象的符号引用 a 是保存在Java虚拟机栈上的，他保存的是堆中刚刚创建出来的的字符串对象的引用。
 			
 			常量池中的“对象”是在编译期就确定好了的，在类被加载的时候创建的，
 			如果类加载时，该字符串常量在常量池中已经有了，那这一步就省略了。
@@ -110,22 +112,57 @@ public class String_Pool {
 		System.out.println("t1 == t2 : "+ (t1 == t2));//true
 		System.out.println("t1 == t3 : "+ (t1 == t3));//true
 		System.out.println("t1 == t4 : "+ (t1 == t4));//false
+		String t5 =new String("abc").intern();
+		System.out.println("t1 == t5 : "+ (t1 == t5));//true
 		
+		System.out.println("-----");
 		
 	    String s = new String("1");//.intern();(true)	//常量池中的“1” 和 JAVA Heap 中的字符串对象。
-	    s.intern();//s 对象去常量池中寻找后发现 “1” 已经在常量池里了
-	    String s2 = "1";//生成一个 s2的引用指向常量池中的“1”对象
+	    String si = s.intern();//s 对象去常量池中寻找后发现 “1” 已经在常量池里了
+	    String s2 = "1";//生成一个 s2 的引用指向常量池中的“1”对象
 	    System.out.println("s == s2: "+(s == s2));//false
+	    System.out.println("si == s2: "+(si == s2));//true
+	    System.out.println("s == si: "+(s == si));//false
 	    
+	    String st = new String("2").intern();//.intern();(true)	//常量池中的“1” 和 JAVA Heap 中的字符串对象。
+	    String sti = st.intern();//st 对象去常量池中寻找后发现 “1” 已经在常量池里了
+	    String st2 = "2";//生成一个 st2 的引用指向常量池中的“1”对象
+	    System.out.println("st == st2: "+(st == st2));//true
+	    System.out.println("sti == st2: "+(sti == st2));//true
+	    System.out.println("st == sti: "+(st == sti));//true
 	    
-	    String s3 = new String("1") + new String("1"); //11 ，常量池中是没有 “11”对象。
+	    /*
+	     *  1. 将String常量池 从 Perm 区移动到了 Java Heap区
+	     *  2. String#intern 方法时，如果存在堆中的对象，会直接保存对象的引用，而不会重新创建对象。
+	     *  
+		     * 	String s = new String("1");
+		     *  String si = s.intern();
+		     *  s == si ; //false
+		     *  
+		     *  String st = new String("2").intern();
+		     *  String sti = st.intern();
+		     *  st == sti; //true
+		     *  
+		     *  String s3 = new String("1") + new String("1"); 
+		     *  String intern_s3 = s3.intern();
+		     *  s3 == intern_s3; //true
+	     *  
+	     *  
+	     *  
+	     * */
+	    
+	    System.out.println("-----");
+	    
+	    String s3 = new String("1") + new String("1"); //字符串常量池中的 “1” 和 JAVA Heap 中的 s3引用指向的对象。中间还有2个匿名的new String("1")，此时s3引用对象内容是”11”，但此时常量池中是没有 “11”对象的。
 	    String intern_s3 = s3.intern();//将 s3中的“11”字符串放入 String 常量池中，因为此时常量池中不存在“11”字符串，
-//	   					因此常规做法是跟 jdk6 图中表示的那样，在常量池中生成一个 “11” 的对象，
-//	          			关键点是 jdk7 中常量池不在 Perm 区域了，这块做了调整。
-//	          			常量池中不需要再存储一份对象了，可以直接存储堆中的引用。
-//	          			这份引用指向 s3 引用的对象。 也就是说引用地址是相同的。
+//				 	   					 因此常规做法是跟 jdk6 图中表示的那样，在常量池中生成一个 “11” 的对象，
+//	          							 关键点是 jdk7 中常量池不在 Perm 区域了，这块做了调整。
+//	          							 常量池中不需要再存储一份对象了，可以直接存储堆中的引用。
+//	          							 这份引用指向 s3 引用的对象。 也就是说引用地址是相同的。
 	    String s4 = "11";//"11"是显示声明的，因此会直接去常量池中创建，创建的时候发现已经有这个对象了，此时也就是指向 s3 引用对象的一个引用。
 	    System.out.println("s3 == s4: "+(s3 == s4));//true
+	    System.out.println("s3 == intern_s3: "+(s3 == intern_s3));//true
+	    System.out.println("intern_s3 == s4: "+(intern_s3 == s4));//true
 	    
 	    String s_3 = new String("1") + new String("1");//当使用 new String()构造的字符字符串 生成 s_3 引用
 	    String s_3t = new String("1") + new String("1");//当使用 new String()构造的字符字符串 生成 s_3t 引用
@@ -133,18 +170,22 @@ public class String_Pool {
 	    
 	    System.out.println("s_3t == s_3: "+(s_3t == s_3));//false
 	    System.out.println("s_3x == s3: "+(s_3x == s3));//true
+	    System.out.println("s_3x == intern_s3: "+(s_3x == intern_s3));//true
+	    System.out.println("s_3x == s4: "+(s_3x == s4));//true
 	    System.out.println("s_3 == s3: "+(s_3 == s3));//false
 	    System.out.println("s_3 == s4: "+(s_3 == s4));//false
-	    System.out.println("s_3x == s4: "+(s_3x == s4));//true
+	   
 	    
 	    String s_4 = "11";//"11"是显示声明的，因此会直接去常量池中创建，创建的时候发现已经有这个对象了，此时也就是指向 s3 引用对象的一个引用。
-	    String intern_s_3 = s_3.intern();//如果常量池中存在当前字符串, 就会直接返回当前字符串.intern_s_3 == "11"
+	    String intern_s_3 = s_3.intern();//如果常量池中存在当前字符串, 就会直接返回当前字符串指向的引用s3
 	    
+	    System.out.println("s_4 == intern_s_3: "+(s_4 == intern_s3));//true
 	    System.out.println("s_3 == intern_s3: "+(s_3 == intern_s3));//false
 	    System.out.println("intern_s_3 == intern_s3: "+(intern_s_3 == intern_s3));//true
 	    System.out.println("s_3 == s4: "+(s_3 == s4));//false
 	    System.out.println("s_3 == s_4: "+(s_3 == s_4));//false
 	    
+	    System.out.println("-----");
 	    
 	    String str1 = "Hollis";//常量池 中声明  "Hollis"
 	    String str2 = new String("Hollis"); //当使用 new String() 构造的字符字符串 生成str2引用
@@ -153,6 +194,31 @@ public class String_Pool {
 	    System.out.println("str1 == str2: "+(str1 == str2));//false
 	    System.out.println("str1 == str3: "+(str1 == str3));//true
 	    System.out.println("str1 == str3: "+str1 == str3);//false ("str1 == str3: "+str1) == str3
+	}
+	
+	//
+	static final int MAX = 1000 * 10000;
+	static final String[] arr = new String[MAX];
+
+	public static void useIntern() throws Exception {
+		
+		//static final int MAX = 1000 * 10000;// 在C/C++中static是可以作用域局部变量的，但是在Java中切记：static/public 是不允许用来修饰局部变量。
+		
+	    Integer[] DB_DATA = new Integer[10];
+	    Random random = new Random(10 * 10000);
+	    
+	    for (int i = 0; i < DB_DATA.length; i++) {
+	        DB_DATA[i] = random.nextInt();
+	    }
+	    
+		long t = System.currentTimeMillis();
+	    for (int i = 0; i < MAX; i++) {
+	        //arr[i] = new String(String.valueOf(DB_DATA[i % DB_DATA.length]));
+	         arr[i] = new String(String.valueOf(DB_DATA[i % DB_DATA.length])).intern();
+	    }
+
+		System.out.println((System.currentTimeMillis() - t) + "ms");
+	    System.gc();
 	}
 	
 	/*
